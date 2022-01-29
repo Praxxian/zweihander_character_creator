@@ -12,7 +12,8 @@
         <h1>Zweihander Character Creator</h1>
         <h2 class="text-danger">This app is under construction!</h2>
         <div class="row mb-3">
-            <button class="btn btn-success" v-on:click="rollAll"><i class="bi bi-dice-6"></i> Roll Everything</button>
+            <button class="btn btn-success col-3" v-on:click="rollAll"><i class="bi bi-dice-6"></i> Roll
+                Everything</button>
         </div>
         <div class="row mb-3">
             <div class="col-3">
@@ -47,18 +48,19 @@
             <div class="row" v-for="attr in Object.keys(char_data.primary_attributes)">
                 <div class="col">
                     <div class="input-group">
-                        <input class="form-control" disabled :value="attr">
-                        <input class="form-control" disabled :value="char_data.primary_attributes[attr]">
-                        <input class="form-control" disabled :value="attributeBonus(attr)">
+                        <span class="input-group-text col-2">{{titleCase(attr)}}</span>
+                        <span class="input-group-text col-1">{{char_data.primary_attributes[attr]}}</span>
+                        <span class="input-group-text col-1">{{attributeBonus(attr)}}</span>
                         <button
                             v-if="primary_attributes_rolled && char_data.ancestral_trait == 'Natural Selection' && !natural_selection_attr"
-                            class="btn btn-warning btn-sm" v-on:click="swapNaturalSelection(attr)"
-                            :disabled="swap_attr"><i class="bi bi-arrow-left-right"></i> 55</button>
+                            class="btn btn-warning btn-sm" v-on:click="swapNaturalSelection(attr)" :disabled="swap_attr"
+                            title="Natural Selection"><i class="bi bi-arrow-left-right"></i> 55</button>
                         <button v-if="primary_attributes_rolled && !primary_attributes_swapped"
-                            class="btn btn-primary btn-sm" v-on:click="swap42(attr)" :disabled="swap_attr"><i
-                                class="bi bi-arrow-left-right"></i> 42</button>
+                            class="btn btn-primary btn-sm" v-on:click="swap42(attr)" :disabled="swap_attr"
+                            title="Swap an attribute for 42 ONCE"><i class="bi bi-arrow-left-right"></i> 42</button>
                         <button v-if="primary_attributes_rolled && !primary_attributes_swapped"
-                            class="btn btn-info btn-sm" v-on:click="swapAttr(attr)" :disabled="attr == swap_attr">Swap</button>
+                            class="btn btn-info btn-sm" v-on:click="swapAttr(attr)" :disabled="attr == swap_attr"
+                            title="Swap two attributes ONCE">Swap</button>
                     </div>
                 </div>
                 <div class="col-3">
@@ -150,13 +152,14 @@
                 ancestry: 'Human',
                 ancestral_trait: null,
                 ancestry_mixed: null,
-                ancestral_trait_mixed: null
+                ancestral_trait_mixed: null,
+                skill_rank_bonuses: {}
             },
             primary_attributes_rolled: false,
             primary_attributes_swapped: false,
             swap_attr: null,
             gender_options: ['Male', 'Female', 'Nonbinary'],
-            ancestry_options: ['Dwarf', 'Elf', 'Gnome', 'Halfling', 'Ogre'],
+            ancestry_options: ['Human', 'Dwarf', 'Elf', 'Gnome', 'Halfling', 'Ogre'],
             ancestral_traits: {
                 Human: [
                     [1, 8, "Blessing in Disguise"],
@@ -186,10 +189,62 @@
                     [86, 92, "Stoneheaded"],
                     [93, 100, "Strength of the Mountain"],
                 ],
-                Elf: [],
-                Gnome: [],
-                Halfling: [],
-                Ogre: [],
+                Elf: [
+                    [1, 8, "Bewitching"],
+                    [9, 16, "Beyond the Veil"],
+                    [17, 25, "Deadly Aim"],
+                    [26, 33, "Enduring Mortality"],
+                    [34, 41, "Fey Treachery"],
+                    [42, 49, "Firstborn"],
+                    [50, 58, "Kindred Warband"],
+                    [59, 67, "Lament of the Ages"],
+                    [68, 76, "Meditative Healing"],
+                    [77, 85, "Nature's Own"],
+                    [86, 92, "Nighteyes"],
+                    [93, 100, "Warrior's Tattoo"],
+                ],
+                Gnome: [
+                    [1, 8, "Clockworks of War"],
+                    [9, 16, "Crag Fighting"],
+                    [17, 25, "Denizen of Stone"],
+                    [26, 33, "Dungeons Deep"],
+                    [34, 41, "Escape Artist"],
+                    [42, 49, "Goldbergian"],
+                    [50, 58, "Hocus Pocus"],
+                    [59, 67, "Metrognome"],
+                    [68, 76, "Thieving Stunties"],
+                    [77, 85, "Tunnel Vision"],
+                    [86, 92, "Underfoot"],
+                    [93, 100, "Wretched Prankster"],
+                ],
+                Halfling: [
+                    [1, 8, "Beguiler"],
+                    [9, 16, "Cat-like Reflexes"],
+                    [17, 25, "Craven"],
+                    [26, 33, "Farsight"],
+                    [34, 41, "Fettered Chaos"],
+                    [42, 49, "Fieldwarden"],
+                    [50, 58, "Fleet-footed"],
+                    [59, 67, "Hijinks"],
+                    [68, 76, "Kleptomania"],
+                    [77, 85, "Low Blow"],
+                    [86, 92, "Memento"],
+                    [93, 100, "Pintsized"],
+                ],
+                Ogre: [
+                    [1, 8, "Broad-bellied"],
+                    [9, 16, "Cast Iron Stomach"],
+                    [17, 25, "Cruisin' For A Bruisin'"],
+                    [26, 33, "Frightening Bellow"],
+                    [34, 41, "Gut-Plate"],
+                    [42, 49, "Hunger Pangs"],
+                    [50, 58, "Mighty Thews"],
+                    [59, 67, "Odd Couple"],
+                    [68, 76, "Rotgut Spray"],
+                    [77, 85, "Slamdance"],
+                    [86, 92, "Thick Lining"],
+                    [93, 100, "Wendigo"],
+                ],
             },
             natural_selection_attr: null,
             natural_selection_original: null,
@@ -199,7 +254,7 @@
                 this.primary_attributes_swapped = false;
                 this.rollAllPrimaryAttributes();
                 this.rollGender();
-                this.rollAncestralTrait();
+                this.rollAncestry();
             },
             rollAllPrimaryAttributes: function () {
                 this.primary_attributes_rolled = true;
@@ -274,6 +329,8 @@
             checkAncestralTraitChanges: function () {
                 this.setMixedAncestry();
                 this.resetNaturalSelection();
+                this.applyStrengthOfTheMountain();
+                this.applyGoldbergian();
             },
             setMixedAncestry: function () {
                 if (this.char_data.ancestral_trait == "Mixed Bloodline") {
@@ -304,7 +361,31 @@
                     this.natural_selection_attr = null;
                     this.natural_selection_original = null;
                 }
+            },
+            titleCase: function (str) {
+                return str[0].toUpperCase() + str.substring(1);
+            },
+            applyStrengthOfTheMountain: function () {
+                if (this.char_data.ancestral_trait == "Strength of the Mountain" || this.char_data.ancestral_trait_mixed == "Strength of the Mountain")
+                    this.char_data.skill_rank_bonuses.brawn = 5;
+                else
+                    this.char_data.skill_rank_bonuses.brawn = 0;
+            },
+            applyGoldbergian: function () {
+                if (this.char_data.ancestral_trait == "Goldbergian" || this.char_data.ancestral_trait_mixed == "Goldbergian") {
+                    this.char_data.skill_rank_bonuses.alchemy = 5;
+                    this.char_data.skill_rank_bonuses.counterfeit = 5;
+                    this.char_data.skill_rank_bonuses.skulduggery = 5;
+                    this.char_data.skill_rank_bonuses.tradecraft = 5;
+                }
+                else {
+                    this.char_data.skill_rank_bonuses.alchemy = 0;
+                    this.char_data.skill_rank_bonuses.counterfeit = 0;
+                    this.char_data.skill_rank_bonuses.skulduggery = 0;
+                    this.char_data.skill_rank_bonuses.tradecraft = 0;
+                }
             }
+            //TODO Thieving Stunties
         }
     });
 </script>
