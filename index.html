@@ -78,7 +78,9 @@
                         Ancestry
                     </label>
                     <div class="input-group">
-                        <input type="text" class="form-control" v-model="char_data.ancestry">
+                        <select class="form-select" v-model="char_data.ancestry">
+                            <option v-for="ancestry in ancestry_options" :value="ancestry">{{ ancestry }}</option>
+                        </select>
                         <button class="btn btn-primary btn-sm" v-on:click="rollAncestry" title="Roll"><i
                                 class="bi bi-dice-6"></i></button>
                     </div>
@@ -104,7 +106,9 @@
                         Mixed Ancestry
                     </label>
                     <div class="input-group">
-                        <input type="text" class="form-control" v-model="char_data.ancestry_mixed">
+                        <select class="form-select" v-model="char_data.ancestry_mixed">
+                            <option v-for="ancestry in mixedAncestryOptions()" :value="ancestry">{{ ancestry }}</option>
+                        </select>
                         <button class="btn btn-primary btn-sm" v-on:click="rollMixedAncestry" title="Roll"><i
                                 class="bi bi-dice-6"></i></button>
                     </div>
@@ -333,10 +337,8 @@
                 this.applyGoldbergian();
             },
             setMixedAncestry: function () {
-                if (this.char_data.ancestral_trait == "Mixed Bloodline") {
+                if (this.char_data.ancestral_trait == "Mixed Bloodline")
                     this.rollMixedAncestry();
-                    this.rollMixedAncestralTrait();
-                }
                 else {
                     this.char_data.ancestry_mixed = null;
                     this.char_data.ancestral_trait_mixed = null;
@@ -344,6 +346,7 @@
             },
             rollMixedAncestry: function () {
                 this.char_data.ancestry_mixed = this.rollArray(this.ancestry_options);
+                this.rollMixedAncestralTrait();
             },
             rollMixedAncestralTrait: function () {
                 let secondTable = this.ancestral_traits[this.char_data.ancestry_mixed];
@@ -384,6 +387,9 @@
                     this.char_data.skill_rank_bonuses.skulduggery = 0;
                     this.char_data.skill_rank_bonuses.tradecraft = 0;
                 }
+            },
+            mixedAncestryOptions: function () {
+                return this.ancestry_options.slice(1);
             }
             //TODO Thieving Stunties
         }
