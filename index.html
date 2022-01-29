@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</header>
+
+<body>
+
+    <div class="container" id="charApp">
+        <h1>Zweihander Character Creator</h1>
+        <div class="row mb-3">
+            <button class="btn btn-success" v-on:click="rollAll"><i class="bi bi-dice-6"></i> Roll Everything</button>
+        </div>
+        <div class="row mb-3">
+            <div class="col-3">
+                <label for="character_name" class="form-label">
+                    Character Name
+                </label>
+                <input type="text" class="form-control" v-model="char_data.name" id="character_name">
+            </div>
+            <div class="col-2">
+                <label for="gender" class="form-label">
+                    Gender
+                </label>
+                <div class="input-group">
+                    <input type="text" class="form-control" v-model="char_data.gender">
+                    <button class="btn btn-primary btn-sm" v-on:click="rollGender" title="Roll"><i
+                            class="bi bi-dice-6"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <h2>Primary Attributes</h2>
+            <div class="row mb-1">
+                <div class="btn-group col-2">
+                    <button class="btn btn-primary btn-sm" v-on:click="rollAllPrimaryAttributes"
+                        :disabled="primary_attributes_rolled" title="Roll"><i class="bi bi-dice-6"></i></button>
+                    <button class="btn btn-danger btn-sm" v-on:click="resetPrimaryAttributes"
+                        :disabled="!primary_attributes_rolled" title="Reset"><i
+                            class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row" v-for="attr in Object.keys(char_data.primary_attributes)">
+                <div class="col">
+                    <div class="input-group">
+                        <input class="form-control" disabled :value="attr">
+                        <input class="form-control" disabled :value="char_data.primary_attributes[attr]">
+                        <input class="form-control" disabled :value="attributeBonus(attr)">
+                        <button
+                            v-if="primary_attributes_rolled && char_data.ancestral_trait == 'Natural Selection' && !natural_selection_attr"
+                            class="btn btn-warning btn-sm" v-on:click="swapNaturalSelection(attr)"
+                            :disabled="swap_attr"><i class="bi bi-arrow-left-right"></i> 55</button>
+                        <button v-if="primary_attributes_rolled && !primary_attributes_swapped"
+                            class="btn btn-primary btn-sm" v-on:click="swap42(attr)" :disabled="swap_attr"><i
+                                class="bi bi-arrow-left-right"></i> 42</button>
+                        <button v-if="primary_attributes_rolled && !primary_attributes_swapped"
+                            class="btn btn-info btn-sm" v-on:click="swapAttr(attr)" :disabled="attr == swap_attr">{{
+                            attr == swap_attr || !swap_attr ? 'Swap' : 'with this' }}</button>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="btn-group">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <h2>Ancestry</h2>
+            <div class="row mb-3">
+                <div class="col-2">
+                    <label for="ancestry" class="form-label">
+                        Ancestry
+                    </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" v-model="char_data.ancestry">
+                        <button class="btn btn-primary btn-sm" v-on:click="rollAncestry" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <label for="ancestry_trait" class="form-label">
+                        Ancestral Trait
+                    </label>
+                    <div class="input-group">
+                        <select class="form-select" v-model="char_data.ancestral_trait"
+                            v-on:change="checkAncestralTraitChanges">
+                            <option v-for="trait in ancestral_traits[char_data.ancestry]" :value="trait[2]">{{ trait[2]
+                                }}</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" v-on:click="rollAncestralTrait" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="row" v-if="char_data.ancestry_mixed">
+                <div class="col-2">
+                    <label for="ancestry2" class="form-label">
+                        Mixed Ancestry
+                    </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" v-model="char_data.ancestry_mixed">
+                        <button class="btn btn-primary btn-sm" v-on:click="rollMixedAncestry" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <label for="ancestry_trait2" class="form-label">
+                        Mixed Ancestral Trait
+                    </label>
+                    <div class="input-group">
+                        <select class="form-select" v-model="char_data.ancestral_trait_mixed">
+                            <option v-for="trait in ancestral_traits[char_data.ancestry_mixed]" :value="trait[2]">{{
+                                trait[2]
+                                }}</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" v-on:click="rollMixedAncestralTrait" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<!-- development version, includes helpful console warnings -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+    crossorigin="anonymous"></script>
+<script>
+    var charApp = new Vue({
+        el: '#charApp',
+        data: {
+            char_data: {
+                name: "",
+                primary_attributes: {
+                    combat: 0,
+                    brawn: 0,
+                    agility: 0,
+                    perception: 0,
+                    intelligence: 0,
+                    willpower: 0,
+                    fellowship: 0,
+                },
+                gender: '',
+                ancestry: 'Human',
+                ancestral_trait: null,
+                ancestry_mixed: null,
+                ancestral_trait_mixed: null
+            },
+            primary_attributes_rolled: false,
+            primary_attributes_swapped: false,
+            swap_attr: null,
+            gender_options: ['Male', 'Female', 'Nonbinary'],
+            ancestry_options: ['Dwarf', 'Elf', 'Gnome', 'Halfling', 'Ogre'],
+            ancestral_traits: {
+                Human: [
+                    [1, 8, "Blessing in Disguise"],
+                    [9, 16, "Danger Sense"],
+                    [17, 25, "Dauntless"],
+                    [26, 33, "Esoteric Memory"],
+                    [34, 41, "Fortune's Wheel"],
+                    [42, 49, "Grim Resolve"],
+                    [50, 58, "Manifest Destiny"],
+                    [59, 67, "Mixed Bloodline"],
+                    [68, 76, "Mountain Amongst Men"],
+                    [77, 85, "Natural Selection"],
+                    [86, 92, "Noble Savage"],
+                    [93, 100, "Seventh Sense"],
+                ],
+                Dwarf: [
+                    [1, 8, "Cavesight"],
+                    [9, 16, "Children of the Earth"],
+                    [17, 25, "Consume Alcohol"],
+                    [26, 33, "Dwarven Warfare"],
+                    [34, 41, "Grudgebearer"],
+                    [42, 49, "Ironclad"],
+                    [50, 58, "Oathkeeper"],
+                    [59, 67, "Physical Prowess"],
+                    [68, 76, "Rune-marked Glory"],
+                    [77, 85, "Stentorian Voice"],
+                    [86, 92, "Stoneheaded"],
+                    [93, 100, "Strength of the Mountain"],
+                ],
+                Elf: [],
+                Gnome: [],
+                Halfling: [],
+                Ogre: [],
+            },
+            natural_selection_attr: null,
+            natural_selection_original: null,
+        },
+        methods: {
+            rollAll: function () {
+                this.primary_attributes_swapped = false;
+                this.rollAllPrimaryAttributes();
+                this.rollGender();
+                this.rollAncestralTrait();
+            },
+            rollAllPrimaryAttributes: function () {
+                this.primary_attributes_rolled = true;
+                for (key in this.char_data.primary_attributes)
+                    this.char_data.primary_attributes[key] = this.rollPrimaryAttribute();
+            },
+            rollPrimaryAttribute: function () {
+                return 25 + this.rollD(10) + this.rollD(10) + this.rollD(10);
+            },
+            rollD: function (sides) {
+                return Math.round(Math.random() * (sides - 1) + 1);
+            },
+            attributeBonus: function (attr) {
+                return this.char_data.primary_attributes[attr].toString().substring(0, 1);
+            },
+            swap42: function (attr) {
+                this.primary_attributes_swapped = true;
+                this.char_data.primary_attributes[attr] = 42;
+            },
+            swapAttr: function (attr) {
+                if (this.swap_attr) {
+                    let firstAttr = this.char_data.primary_attributes[this.swap_attr];
+                    let secondAttr = this.char_data.primary_attributes[attr];
+                    this.char_data.primary_attributes[this.swap_attr] = secondAttr;
+                    this.char_data.primary_attributes[attr] = firstAttr;
+                    if (this.swap_attr == this.natural_selection_attr)
+                        this.natural_selection_attr = attr;
+                    this.swap_attr = null;
+                    this.primary_attributes_swapped = true;
+                }
+                else {
+                    this.swap_attr = attr;
+                }
+            },
+            resetPrimaryAttributes: function () {
+                for (key in this.char_data.primary_attributes)
+                    this.char_data.primary_attributes[key] = 0;
+                this.swap_attr = null;
+                this.primary_attributes_swapped = false;
+                this.primary_attributes_rolled = false;
+                this.resetNaturalSelection();
+            },
+            rollGender: function () {
+                this.char_data.gender = this.rollArray(this.gender_options, this.char_data.gender);
+            },
+            rollArray: function (arr, currentValue = null) {
+                if (!arr || arr.length < 1)
+                    return null;
+                let newRoll = arr[Math.round(Math.random() * (arr.length - 1))];
+                while (newRoll == currentValue)
+                    newRoll = arr[Math.round(Math.random() * (arr.length - 1))];
+                return newRoll;
+            },
+            rollAncestry: function () {
+                this.char_data.ancestry = this.rollArray(this.ancestry_options, this.char_data.ancestry);
+                this.rollAncestralTrait();
+            },
+            rollAncestralTrait: function () {
+                let table = this.ancestral_traits[this.char_data.ancestry];
+                this.char_data.ancestral_trait = this.rollTable(table);
+                this.setMixedAncestry();
+            },
+            rollTable: function (table, diceSize = 100, current = null) {
+                let roll = this.rollD(100);
+                for (i in table) {
+                    if (table[i][0] <= roll && table[i][1] >= roll && table[i][2] != current)
+                        return table[i][2];
+                    else if (table[i][2] == current)
+                        return this.rollTable(table, diceSize, current);
+                }
+            },
+            checkAncestralTraitChanges: function () {
+                this.setMixedAncestry();
+                this.resetNaturalSelection();
+            },
+            setMixedAncestry: function () {
+                if (this.char_data.ancestral_trait == "Mixed Bloodline") {
+                    this.rollMixedAncestry();
+                    this.rollMixedAncestralTrait();
+                }
+                else {
+                    this.char_data.ancestry_mixed = null;
+                    this.char_data.ancestral_trait_mixed = null;
+                }
+            },
+            rollMixedAncestry: function () {
+                this.char_data.ancestry_mixed = this.rollArray(this.ancestry_options);
+            },
+            rollMixedAncestralTrait: function () {
+                let secondTable = this.ancestral_traits[this.char_data.ancestry_mixed];
+                this.char_data.ancestral_trait_mixed = this.rollTable(secondTable);
+            },
+            swapNaturalSelection: function (attr) {
+                this.natural_selection_attr = attr;
+                this.natural_selection_original = this.char_data.primary_attributes[attr];
+                this.char_data.primary_attributes[attr] = 55;
+            },
+            resetNaturalSelection: function () {
+                if (this.char_data.ancestral_trait != 'Natural Selection') {
+                    if (this.natural_selection_attr && this.char_data.ancestral_trait)
+                        this.char_data.primary_attributes[this.natural_selection_attr] = this.natural_selection_original;
+                    this.natural_selection_attr = null;
+                    this.natural_selection_original = null;
+                }
+            }
+        }
+    });
+</script>
+
+</html>
