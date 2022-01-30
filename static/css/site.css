@@ -1,3 +1,70 @@
 * {
-    font-family: garamond;
-  }
+  font-family: garamond;
+}
+
+.btn-primary {
+  color: #333;
+  background-color: #fd6e0d;
+  border-color: #fd6e0d
+}
+
+.btn-primary:hover {
+  color: #333;
+  background-color: #d75e0b;
+  border-color: #ca580a
+}
+
+.btn-check:focus+.btn-primary, .btn-primary:focus {
+  color: #333;
+  background-color: #d75e0b;
+  border-color: #ca580a;
+  box-shadow: 0 0 0 .25rem rgba(253, 132, 49, .5)
+}
+
+.btn-check:active+.btn-primary, .btn-check:checked+.btn-primary, .btn-primary.active, .btn-primary:active, .show>.btn-primary.dropdown-toggle {
+  color: #333;
+  background-color: #ca580a;
+  border-color: #be530a
+}
+
+.btn-check:active+.btn-primary:focus, .btn-check:checked+.btn-primary:focus, .btn-primary.active:focus, .btn-primary:active:focus, .show>.btn-primary.dropdown-toggle:focus {
+  box-shadow: 0 0 0 .25rem rgba(253, 132, 49, .5)
+}
+
+.btn-primary.disabled, .btn-primary:disabled {
+  color: #666;
+  background-color: #fcb;
+  border-color: #fcb
+}
+
+.form-control {
+  color: #333;
+  background-color: #888;
+  border: 1px solid #666;
+}
+
+.form-control:focus {
+  outline: 0;
+  box-shadow: 0 0 0 .25rem rgba(255, 100, 0, .25);
+  border-color: #feb786;
+  outline: 0;
+}
+
+.form-select {
+  color: #333;
+  background-color: #888;
+  border: 1px solid #666;
+}
+
+.form-select:focus {
+  outline: 0;
+  box-shadow: 0 0 0 .25rem rgba(255, 100, 0, .25);
+  border-color: #feb786;
+  outline: 0;
+}
+
+.input-group-text {
+  color: #000;
+  background-color: #666;
+  border: 1px solid #444;
+}
