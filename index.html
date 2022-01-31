@@ -23,16 +23,6 @@
                 </label>
                 <input type="text" class="form-control" v-model="char_data.name" id="character_name">
             </div>
-            <div class="col-2">
-                <label for="gender" class="form-label">
-                    Gender
-                </label>
-                <div class="input-group">
-                    <input type="text" class="form-control" v-model="char_data.gender">
-                    <button class="btn btn-primary btn-sm" v-on:click="rollGender" title="Roll"><i
-                            class="bi bi-dice-6"></i></button>
-                </div>
-            </div>
         </div>
         <div class="row mb-3">
             <h2>Primary Attributes</h2>
@@ -55,7 +45,8 @@
                         <button
                             v-if="primary_attributes_rolled && char_data.ancestral_trait == 'Natural Selection' && !natural_selection_attr"
                             class="btn btn-warning btn-sm" v-on:click="swapNaturalSelection(attr)" :disabled="swap_attr"
-                            title="Natural Selection"><i class="bi bi-arrow-left-right"></i> 55</button>
+                            title="Natural Selection"><i class="bi bi-arrow-left-right"></i>
+                            55</button>
                         <button v-if="primary_attributes_rolled && !primary_attributes_swapped"
                             class="btn btn-primary btn-sm" v-on:click="swap42(attr)" :disabled="swap_attr"
                             title="Swap an attribute for 42 ONCE"><i class="bi bi-arrow-left-right"></i> 42</button>
@@ -72,8 +63,18 @@
             </div>
         </div>
         <div class="row mb-3">
-            <h2>Ancestry</h2>
+            <h2>Gender & Ancestry</h2>
             <div class="row mb-3">
+                <div class="col-3">
+                    <label for="gender" class="form-label">
+                        Gender
+                    </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" v-model="char_data.gender">
+                        <button class="btn btn-primary btn-sm" v-on:click="rollGender" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
                 <div class="col-3">
                     <label for="ancestry" class="form-label">
                         Ancestry
@@ -140,7 +141,7 @@
                         <select class="form-select" v-model="char_data.archetype" v-on:change="rollProfession()">
                             <option v-for="archetype in archetypes" :value="archetype[2]">{{ archetype[2] }}</option>
                         </select>
-                        <button class="btn btn-primary btn-sm" v-on:click="rollArchetype" title="Roll"><i
+                        <button class="btn btn-primary btn-sm" v-on:click="rollArchetype()" title="Roll"><i
                                 class="bi bi-dice-6"></i></button>
                     </div>
                 </div>
@@ -158,14 +159,70 @@
             </div>
         </div>
         <div class="row mb-3">
-            <h2>Combat</h2>
+            <h2>Secondary Attributes</h2>
+            <div class="input-group">
+                <span class="input-group-text col-2">Peril Threshold</span>
+                <span class="input-group-text col-1">{{peril_threshold}}</span>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text col-2">Damage Threshold</span>
+                <span class="input-group-text col-1">{{damage_threshold}}</span>
+            </div>
             <div class="input-group">
                 <span class="input-group-text col-2">Initiative</span>
-                <span class="input-group-text col-2">{{initiative}}</span>
+                <span class="input-group-text col-1">{{initiative}}</span>
             </div>
             <div class="input-group">
                 <span class="input-group-text col-2">Movement</span>
-                <span class="input-group-text col-2">{{movement}}</span>
+                <span class="input-group-text col-1">{{movement}}</span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <h2>Background</h2>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <label for="season" class="form-label">Season of Birth</label>
+                    <div class="input-group">
+                        <select class="form-select" v-model="char_data.season" v-on:change="rollDooming()">
+                            <option v-for="season in seasons" :value="season">{{ season }}</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" v-on:click="rollSeason()" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label for="dooming" class="form-label">Dooming</label>
+                    <div class="input-group">
+                        <select class="form-select" v-model="char_data.dooming">
+                            <option v-for="dooming in doomings[char_data.season]" :value="dooming[2]">{{ dooming[2] }}
+                            </option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" v-on:click="rollDooming()" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <label for="age" class="form-label">Age Group</label>
+                    <div class="input-group">
+                        <select class="form-select" v-model="char_data.age" v-on:change="rollAllDistinguishingMarks()">
+                            <option v-for="age in age_groups" :value="age">{{ age }}</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" v-on:click="rollAge()" title="Roll"><i
+                                class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
+                <div class="col-4" v-if="char_data.distinguishing_marks.length > 0">
+                    <label for="age" class="form-label">Distinguishing Marks</label>
+                    <div class="input-group" v-for="(mark,index) in char_data.distinguishing_marks">
+                        <select class="form-select" v-model="char_data.distinguishing_marks[index]">
+                            <option v-for="m in distinguishing_marks" :value="m">{{ m }}</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" v-on:click="rollDistinguishingMarkAt(index)"
+                            title="Roll"><i class="bi bi-dice-6"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -198,7 +255,11 @@
                 ancestral_trait_mixed: null,
                 archetype: null,
                 profession: null,
-                skill_rank_bonuses: {},
+                season: null,
+                dooming: null,
+                age: null,
+                distinguishing_marks: [],
+                //
                 height: null,
                 build: null,
             },
@@ -414,22 +475,251 @@
                     [86, 92, "Squire"],
                     [93, 100, "Watchman"],
                 ]
-            }
+            },
+            seasons: ['Spring', 'Summer', 'Autumn', 'Winter'],
+            doomings: {
+                Spring: [
+                    [1, 4, 'Pride comes before a fall'],
+                    [5, 8, 'Ivy will claw at your skin and prick like a rose'],
+                    [9, 12, 'Health is not always healthy'],
+                    [13, 16, 'Still waters run deep'],
+                    [17, 20, 'The forest will strike back when the campfire is low'],
+                    [21, 24, 'Do not pluck low-hanging fruit'],
+                    [25, 28, 'The serpent is in the garden'],
+                    [29, 32, 'Climb not the mighty oak'],
+                    [33, 36, 'Beware fairy rings and standing stones'],
+                    [37, 40, 'The land will reclaim what is hers'],
+                    [41, 44, 'Do not stare directly into the light'],
+                    [45, 48, 'Good intentions create bad situations'],
+                    [49, 52, 'Do not accept trust lightly'],
+                    [53, 56, 'There is always another problem'],
+                    [57, 60, 'Light burns just as much as it heals'],
+                    [61, 64, 'Radiance can\'t illuminate all'],
+                    [65, 68, 'Charity will cause your end'],
+                    [69, 72, 'Underestimate no one'],
+                    [73, 76, 'Birth is but the start of death'],
+                    [77, 80, 'Provide no succor to the blind man'],
+                    [81, 84, 'Do not pick up discarded coins'],
+                    [85, 88, 'Twice for poison, thrice for a kiss'],
+                    [89, 92, 'Fate is cruel, but ironic'],
+                    [93, 96, 'A trick is not an illusion'],
+                    [97, 100, 'You will be stabbed by your own knife']
+                ],
+                Summer: [
+                    [1, 4, 'Your end will be at the head of a hammer'],
+                    [5, 8, 'You will see your own hubris and end your life'],
+                    [9, 12, 'Those you love will kill you'],
+                    [13, 16, 'Beware the comet\'s warning'],
+                    [17, 20, 'They will come as twins and leave as triplets'],
+                    [21, 24, 'You will die trying to save someone you love'],
+                    [25, 28, 'Beware a lover scorned'],
+                    [29, 32, 'You will witness the end, then go into it'],
+                    [33, 36, 'The heathen will cut you down'],
+                    [37, 40, 'Your final moments will be full of divine pain'],
+                    [41, 44, 'Your flame shall consume you'],
+                    [45, 48, 'Mercy will be your downfall'],
+                    [49, 52, 'You will burn brightly, then be snuffed out'],
+                    [53, 56, 'The unlit path is the most dangerous'],
+                    [57, 60, 'Iron will bend under heat'],
+                    [61, 64, 'Respect power, for it does not respect you'],
+                    [65, 68, 'Never leave a fire burning'],
+                    [69, 72, 'Never turn your back on a foe'],
+                    [73, 76, 'Your embers shall smolder'],
+                    [77, 80, 'The sun can be a cruel friend'],
+                    [81, 84, 'Death comes from above and below'],
+                    [85, 88, 'Lightning sometimes does strike twice'],
+                    [89, 92, 'A squall occurs before a storm'],
+                    [93, 96, 'The eye of a storm is just a reprieve'],
+                    [97, 100, 'The heavens will open, angry and bright']
+                ],
+                Autumn: [
+                    [1, 4, 'A murder of another will herald thine death'],
+                    [5, 8, 'Thy skin shall darken as if soaked in ink'],
+                    [9, 12, 'Do not cross a freshly dug tomb'],
+                    [13, 16, 'You shall see thine death twice'],
+                    [17, 20, 'Up from the canyon, soars the raven'],
+                    [21, 24, 'Sorrow will fill your heart at death'],
+                    [25, 28, 'You shall not see the end'],
+                    [29, 32, 'One step forward, two steps back'],
+                    [33, 36, 'The jackdaw is a false omen'],
+                    [37, 40, 'A visage will haunt you to your grave'],
+                    [41, 44, 'The Eye will look upon you with scorn'],
+                    [45, 48, 'You will die in a pool of blood, but it will not be yours'],
+                    [49, 52, 'Your end will not be clean'],
+                    [53, 56, 'Sickness will be your downfall'],
+                    [57, 60, 'The stench of the grave follows you'],
+                    [61, 64, 'New beginnings herald sudden ends'],
+                    [65, 68, 'The Abyss also gazes back'],
+                    [69, 72, 'The shadows stalk hungrily'],
+                    [73, 76, 'Three flies bring your doom'],
+                    [77, 80, 'Beware the black stallion'],
+                    [81, 84, 'Do not fold, always stay'],
+                    [85, 88, 'Confusion will kill more than you'],
+                    [89, 92, 'Do not be fooled by appearances'],
+                    [93, 96, 'Avoid the exotic when possible'],
+                    [97, 100, 'Do not push for more, as you will get it']
+                ],
+                Winter: [
+                    [1, 4, 'Beware the toothless hound'],
+                    [5, 8, 'Warm winters bring hard frost'],
+                    [9, 12, 'Do not trust what you can\'t see'],
+                    [13, 16, 'Blood will be upon your hands'],
+                    [17, 20, 'The oldest are the strongest'],
+                    [21, 24, 'Be wary of false friends'],
+                    [25, 28, 'Numbers overwhelm might'],
+                    [29, 32, 'Your killer will not know your name'],
+                    [33, 36, 'At times, being found is worse than being lost'],
+                    [37, 40, 'Do not tread upon thick ice nor thin'],
+                    [41, 44, 'Iron is weak, gold is strong'],
+                    [45, 48, 'Your left eye will not see the truth'],
+                    [49, 52, 'Revenge is upon you'],
+                    [53, 56, 'Absolute power corrupts absolutely'],
+                    [57, 60, 'Being immovable is not always a boon'],
+                    [61, 64, 'Some things, man should not know'],
+                    [65, 68, 'Justice is blind, deaf and dumb'],
+                    [69, 72, 'Six of one, half a dozen of the other'],
+                    [73, 76, 'Fear change, as it changes you'],
+                    [77, 80, 'The gavel will ring twice'],
+                    [81, 84, 'The stars can lead you astray'],
+                    [85, 88, 'The depths are crushing, the shallows inviting'],
+                    [89, 92, 'From the cold, something eyes you hungrily'],
+                    [93, 96, 'You, too can be touched by the unknown'],
+                    [97, 100, 'Do not fly too close to the stars']
+                ],
+            },
+            age_groups: ['Young', 'Adult', 'Middle Aged', 'Elderly'],
+            distinguishing_marks: ['Abnormally white teeth',
+                'Abundance of freckles on face',
+                'Acne-scarred face',
+                'Additional toes or fingers',
+                'Almond-shaped eyes',
+                'Asexual appearance',
+                'Ashy Elbows',
+                'Balding pate',
+                'Beaded mustachio',
+                'Beady eyes',
+                'Beauty mark on face',
+                'Big ears',
+                'Blood-shot eyes',
+                'Bow-legged walk',
+                'Branded with cattle iron',
+                'Broken nose',
+                'Buck-toothed or snaggle-toothed',
+                'Bulging eyes',
+                'Burn scars on face and arms',
+                'Bushy eyebrows',
+                'Carefully-groomed beard',
+                'Cherubic face',
+                'Clammy hands',
+                'Claw marks over face',
+                'Covered in black moles',
+                'Curly locks of hair',
+                'Devilish goatee',
+                'Different colored eyes',
+                'Dimpled cheeks',
+                'Doll-like face',
+                'Drooping eye',
+                'Dry, flaking skin',
+                'Ear half-missing',
+                'Embarrassing acne scars',
+                'Embarrassing tattoo on face',
+                'Excessive body hair',
+                'Eyes too far apart',
+                'False finger',
+                'Farmer\'s tan',
+                'Glasgow grin',
+                'Golden lock of hair',
+                'Hare lip',
+                'Hooked nose',
+                'Horse-faced',
+                'Humpbacked',
+                'Incredibly beautiful',
+                'Itchy scabies bites',
+                'Jaundiced complexion',
+                'Lanky hair',
+                'Large and hairy mole',
+                'Large nose',
+                'Large red birthmark on arms',
+                'Lazy eye',
+                'Leathery countenance',
+                'Lichtenberg scar',
+                'Long eyelashes',
+                'Long mustachio',
+                'Long sideburns',
+                'Milky eye',
+                'Mismatched eye color',
+                'Missing an eyebrow',
+                'Missing fingers',
+                'Nervous tic',
+                'Older-looking face',
+                'Painted beard',
+                'Pallid countenance',
+                'Patch of white hair',
+                'Perfect posture',
+                'Perpetual sneer',
+                'Perpetually deep frown',
+                'Piercing eyes',
+                'Pigeon-toed stance',
+                'Pot belly',
+                'Pox scars all over body',
+                'Pronounced brow',
+                'Purple bags beneath eyes',
+                'Rancid breath',
+                'Rash of pimples',
+                'Rheumy eyes',
+                'Six-fingered hand',
+                'Slouchy posture',
+                'Spiked mohawk',
+                'Squinting eyes or false eye patch',
+                'Steely gaze',
+                'Strong jaw',
+                'Sunburn scars',
+                'Sunken eyes',
+                'Tanned, leathery skin',
+                'Tarred and feathered',
+                'Terribly crooked teeth',
+                'Vacant expression',
+                'Veteran\'s nose',
+                'Vulgar tattoo',
+                'Weak chin',
+                'Wears spectacles',
+                'Webbed hands and feet',
+                'Widow\'s peak',
+                'Wind-chapped cheeks',
+                'Yellow scum on teeth',
+                'Yellowed fingernails and toenails'
+            ],
         },
         computed: {
-            movement: function () {
-                let movement = 3 + this.attributeBonus("agility");
-                if (this.hasAncestralTrait("Physical Prowess"))
-                    movement = Math.max(movement, 3 + this.attributeBonus("brawn"));
-                if (this.hasAncestralTrait("Thieving Stunties"))
-                    movement -= 3;
-                return movement;
+            peril_threshold: function () {
+                let threshold = 3 + this.attributeBonus('willpower');
+                return threshold;
+            },
+            damage_threshold: function () {
+                let threshold = this.attributeBonus('brawn');
+                if (this.hasAncestralTrait('Beguiler'))
+                    threshold = Math.max(threshold, this.attributeBonus('fellowship'));
+                // TODO Gut-Plate bonus from unarmored?
+                // TODO Armor?
+                return threshold;
+            },
+            encumbrance_limit: function () {
+                var limit = 2 + this.attributeBonus('brawn');
+                return limit;
             },
             initiative: function () {
                 let initiative = 3 + this.attributeBonus("perception");
                 if (this.hasAncestralTrait("Underfoot"))
                     initiative += 3;
                 return initiative;
+            },
+            movement: function () {
+                let movement = 3 + this.attributeBonus("agility");
+                if (this.hasAncestralTrait("Physical Prowess"))
+                    movement = Math.max(movement, 3 + this.attributeBonus("brawn"));
+                if (this.hasAncestralTrait("Thieving Stunties") || this.hasAncestralTrait("Pintsized"))
+                    movement -= 3;
+                return movement;
             }
         },
         methods: {
@@ -439,6 +729,8 @@
                 this.rollGender();
                 this.rollAncestry();
                 this.rollArchetype();
+                this.rollSeason();
+                this.rollAge();
             },
             rollAllPrimaryAttributes: function () {
                 this.primary_attributes_rolled = true;
@@ -520,8 +812,6 @@
             checkAncestralTraitChanges: function () {
                 this.setMixedAncestry();
                 this.resetNaturalSelection();
-                this.applyStrengthOfTheMountain();
-                this.applyGoldbergian();
             },
             setMixedAncestry: function () {
                 if (this.hasAncestralTrait("Mixed Bloodline"))
@@ -555,26 +845,6 @@
             titleCase: function (str) {
                 return str[0].toUpperCase() + str.substring(1);
             },
-            applyStrengthOfTheMountain: function () {
-                if (this.hasAncestralTrait("Strength of the Mountain"))
-                    this.char_data.skill_rank_bonuses.brawn = 5;
-                else
-                    this.char_data.skill_rank_bonuses.brawn = 0;
-            },
-            applyGoldbergian: function () {
-                if (this.hasAncestralTrait("Goldbergian")) {
-                    this.char_data.skill_rank_bonuses.alchemy = 5;
-                    this.char_data.skill_rank_bonuses.counterfeit = 5;
-                    this.char_data.skill_rank_bonuses.skulduggery = 5;
-                    this.char_data.skill_rank_bonuses.tradecraft = 5;
-                }
-                else {
-                    this.char_data.skill_rank_bonuses.alchemy = 0;
-                    this.char_data.skill_rank_bonuses.counterfeit = 0;
-                    this.char_data.skill_rank_bonuses.skulduggery = 0;
-                    this.char_data.skill_rank_bonuses.tradecraft = 0;
-                }
-            },
             mixedAncestryOptions: function () {
                 return this.ancestry_options.slice(1);
             },
@@ -594,8 +864,31 @@
                     let table = this.professions[this.char_data.archetype];
                     this.char_data.profession = this.rollTable(table, 100, this.char_data.profession);
                 }
+            },
+            rollSeason: function () {
+                this.char_data.season = this.rollArray(this.seasons, this.char_data.season);
+                this.rollDooming();
+            },
+            rollDooming: function () {
+                if (this.char_data.season) {
+                    let table = this.doomings[this.char_data.season];
+                    this.char_data.dooming = this.rollTable(table, 100, this.char_data.dooming);
+                }
+            },
+            rollAge: function () {
+                this.char_data.age = this.rollArray(this.age_groups, this.char_data.age);
+                this.rollAllDistinguishingMarks();
+            },
+            rollAllDistinguishingMarks() {
+                this.char_data.distinguishing_marks = [];
+                let markCount = this.age_groups.indexOf(this.char_data.age);
+                for (let i = 0; i < markCount; i++)
+                    this.rollDistinguishingMarkAt(i);
+            },
+            rollDistinguishingMarkAt(index) {
+                let mark = this.rollArray(this.distinguishing_marks);
+                Vue.set(this.char_data.distinguishing_marks, index, mark);
             }
-            // TODO after calculating more character sheet values, go back and look through traits for modifications
         }
     });
 </script>
