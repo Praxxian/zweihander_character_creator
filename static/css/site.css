@@ -68,3 +68,12 @@
   background-color: #666;
   border: 1px solid #444;
 }
+
+table {
+  width: auto !important;
+  table-layout: auto !important;
+}
+
+table tbody td {
+  width: auto !important;
+}
