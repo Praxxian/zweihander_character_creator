@@ -216,6 +216,18 @@
                         v-bind:collection="complexions" v-bind:is_array="false" v-on:roll-click="rollComplexion()">
                     </select-roll>
                 </div>
+                <div class="col-3">
+                    <select-roll v-bind:title="'Build Type'" v-model="char_data.build_type"
+                        v-bind:collection="build_types" v-bind:is_array="true" v-on:roll-click="rollBuildType()">
+                    </select-roll>
+                </div>
+                <div class="col-3">
+                    <select-roll v-if="char_data.ancestry && char_data.gender && char_data.build_type"
+                        v-bind:title="'Height & Weight'" v-model="char_data.height_weight"
+                        v-bind:collection="heighWeightOptions" v-bind:is_array="true"
+                        v-on:roll-click="rollHeightWeight()">
+                    </select-roll>
+                </div>
             </div>
         </div>
     </div>
@@ -269,11 +281,7 @@
                 distinguishing_marks: [],
                 complexion: null,
                 build_type: null,
-                height: null,
-                weight: null,
-                //
-                height: null,
-                build: null,
+                height_weight: null
             },
             primary_attributes_rolled: false,
             primary_attributes_swapped: false,
@@ -712,7 +720,142 @@
                 [71, 80, 'Brown skin'],
                 [81, 90, 'Dark brown skin'],
                 [91, 100, 'Ebony skin']
-            ]
+            ],
+            build_types: ['Frail', 'Slender', 'Normal', 'Husky', 'Corpulent'],
+            heights_weights: {
+                Human: {
+                    Female: [[5.2, 92, 102, 121, 159, 198],
+                    [5.3, 97, 106, 126, 164, 202],
+                    [5.4, 102, 111, 130, 169, 207],
+                    [5.5, 106, 116, 135, 174, 212],
+                    [5.6, 111, 121, 140, 178, 217],
+                    [5.7, 116, 126, 145, 183, 222],
+                    [5.8, 121, 130, 150, 188, 226],
+                    [5.9, 126, 135, 154, 193, 231],
+                    [5.1, 130, 140, 159, 198, 236],
+                    [5.11, 135, 145, 164, 202, 241],],
+                    Male: [[5.5, 115, 127, 151, 199, 247],
+                    [5.6, 121, 133, 157, 205, 253],
+                    [5.7, 127, 139, 163, 211, 259],
+                    [5.8, 133, 145, 169, 217, 265],
+                    [5.9, 139, 151, 175, 223, 271],
+                    [5.1, 145, 157, 181, 229, 277],
+                    [5.11, 151, 163, 187, 235, 283],
+                    [6, 157, 169, 193, 241, 289],
+                    [6.1, 163, 175, 199, 247, 295],
+                    [6.2, 169, 181, 205, 253, 301],],
+                },
+                Dwarf: {
+                    Female: [[4.2, 72, 82, 101, 139, 178],
+                    [4.3, 77, 86, 106, 144, 182],
+                    [4.4, 82, 91, 110, 149, 187],
+                    [4.5, 86, 96, 115, 154, 192],
+                    [4.6, 91, 101, 120, 158, 197],
+                    [4.7, 96, 106, 125, 163, 202],
+                    [4.8, 101, 110, 130, 168, 206],
+                    [4.9, 106, 115, 134, 173, 211],
+                    [4.1, 110, 120, 139, 178, 216],
+                    [4.11, 115, 125, 144, 182, 221],],
+                    Male: [[4.5, 90, 102, 126, 174, 222],
+                    [4.6, 96, 108, 132, 180, 228],
+                    [4.7, 102, 114, 138, 186, 234],
+                    [4.8, 108, 120, 144, 192, 240],
+                    [4.9, 114, 126, 150, 198, 246],
+                    [4.1, 120, 132, 156, 204, 252],
+                    [4.11, 126, 138, 162, 210, 258],
+                    [5, 132, 144, 168, 216, 264],
+                    [5.1, 138, 150, 174, 222, 270],
+                    [5.2, 144, 156, 180, 228, 276],],
+                },
+                Elf: {
+                    Female: [[5.5, 72, 82, 101, 139, 178],
+                    [5.6, 77, 86, 106, 144, 182],
+                    [5.7, 82, 91, 110, 149, 187],
+                    [5.8, 86, 96, 115, 154, 192],
+                    [5.9, 91, 101, 120, 158, 197],
+                    [5.1, 96, 106, 125, 163, 202],
+                    [5.11, 101, 110, 130, 168, 206],
+                    [6, 106, 115, 134, 173, 211],
+                    [6.1, 110, 120, 139, 178, 216],
+                    [6.2, 115, 125, 144, 182, 221],],
+                    Male: [[5.8, 90, 102, 126, 174, 222],
+                    [5.9, 96, 108, 132, 180, 228],
+                    [5.1, 102, 114, 138, 186, 234],
+                    [5.11, 108, 120, 144, 192, 240],
+                    [6, 114, 126, 150, 198, 246],
+                    [6.1, 120, 132, 156, 204, 252],
+                    [6.2, 126, 138, 162, 210, 258],
+                    [6.3, 132, 144, 168, 216, 264],
+                    [6.4, 138, 150, 174, 222, 270],
+                    [6.5, 144, 156, 180, 228, 276],],
+                },
+                Gnome: {
+                    Female: [[4, 52, 62, 81, 119, 158],
+                    [4.1, 57, 66, 86, 124, 162],
+                    [4.2, 62, 71, 90, 129, 167],
+                    [4.3, 66, 76, 95, 134, 172],
+                    [4.4, 71, 81, 100, 138, 177],
+                    [4.5, 76, 86, 105, 143, 182],
+                    [4.6, 81, 90, 110, 148, 186],
+                    [4.7, 86, 95, 114, 153, 191],
+                    [4.8, 90, 100, 119, 158, 196],
+                    [4.9, 95, 105, 124, 162, 201],],
+                    Male: [[4.3, 65, 77, 101, 149, 197],
+                    [4.4, 71, 83, 107, 155, 203],
+                    [4.5, 77, 89, 113, 161, 209],
+                    [4.6, 83, 95, 119, 167, 215],
+                    [4.7, 89, 101, 125, 173, 221],
+                    [4.8, 95, 107, 131, 179, 227],
+                    [4.9, 101, 113, 137, 185, 233],
+                    [4.1, 107, 119, 143, 191, 239],
+                    [4.11, 113, 125, 149, 197, 245],
+                    [5, 119, 131, 155, 203, 251],],
+                },
+                Halfling: {
+                    Female: [[3.5, 32, 42, 61, 99, 138],
+                    [3.6, 37, 46, 66, 104, 142],
+                    [3.7, 42, 51, 70, 109, 147],
+                    [3.8, 46, 56, 75, 114, 152],
+                    [3.9, 51, 61, 80, 118, 157],
+                    [3.1, 56, 66, 85, 123, 162],
+                    [3.11, 61, 70, 90, 128, 166],
+                    [4, 66, 75, 94, 133, 171],
+                    [4.1, 70, 80, 99, 138, 176],
+                    [4.2, 75, 85, 104, 142, 181],],
+                    Male: [[3.8, 40, 52, 76, 124, 172],
+                    [3.9, 46, 58, 82, 130, 178],
+                    [3.1, 52, 64, 88, 136, 184],
+                    [3.11, 58, 70, 94, 142, 190],
+                    [4, 64, 76, 100, 148, 196],
+                    [4.1, 70, 82, 106, 154, 202],
+                    [4.2, 76, 88, 112, 160, 208],
+                    [4.3, 82, 94, 118, 166, 214],
+                    [4.4, 88, 100, 124, 172, 220],
+                    [4.5, 94, 106, 130, 178, 226],],
+                },
+                Ogre: {
+                    Female: [[8.2, 480, 490, 509, 547, 586],
+                    [8.3, 485, 494, 514, 552, 590],
+                    [8.4, 490, 499, 518, 557, 595],
+                    [8.5, 494, 504, 523, 562, 600],
+                    [8.6, 499, 509, 528, 566, 605],
+                    [8.7, 504, 514, 533, 571, 610],
+                    [8.8, 509, 518, 538, 576, 614],
+                    [8.9, 514, 523, 542, 581, 619],
+                    [8.1, 518, 528, 547, 586, 624],
+                    [8.11, 523, 533, 552, 590, 629],],
+                    Male: [[8.5, 600, 612, 636, 684, 732],
+                    [8.6, 606, 618, 642, 690, 738],
+                    [8.7, 612, 624, 648, 696, 744],
+                    [8.8, 618, 630, 654, 702, 750],
+                    [8.9, 624, 636, 660, 708, 756],
+                    [8.1, 630, 642, 666, 714, 762],
+                    [8.11, 636, 648, 672, 720, 768],
+                    [9, 642, 654, 678, 726, 774],
+                    [9.1, 648, 660, 684, 732, 780],
+                    [9.2, 654, 666, 690, 738, 786],],
+                },
+            },
         },
         computed: {
             peril_threshold: function () {
@@ -747,6 +890,13 @@
             },
             mixedAncestryOptions: function () {
                 return this.ancestry_options.slice(1);
+            },
+            heighWeightOptions: function () {
+                let values = this.heights_weights[this.char_data.ancestry][this.char_data.gender];
+                let formattedValues = values.map(x => this.formatHeightWeight(x));
+                if (formattedValues.indexOf(this.char_data.height_weight) < 0)
+                    this.rollHeightWeight();
+                return values.map(x => this.formatHeightWeight(x));
             }
         },
         methods: {
@@ -759,6 +909,8 @@
                 this.rollSeason();
                 this.rollAge();
                 this.rollComplexion();
+                this.rollBuildType();
+                this.rollHeightWeight();
             },
             rollAllPrimaryAttributes: function () {
                 this.primary_attributes_rolled = true;
@@ -810,6 +962,7 @@
             },
             rollGender: function () {
                 this.char_data.gender = this.rollArray(this.gender_options, this.char_data.gender);
+                this.rollHeightWeight();
             },
             rollArray: function (arr, currentValue = null) {
                 if (!arr || arr.length < 1)
@@ -822,6 +975,7 @@
             rollAncestry: function () {
                 this.char_data.ancestry = this.rollArray(this.ancestry_options, this.char_data.ancestry);
                 this.rollAncestralTrait();
+                this.rollHeightWeight();
             },
             rollAncestralTrait: function () {
                 let table = this.ancestral_traits[this.char_data.ancestry];
@@ -840,6 +994,7 @@
             checkAncestralTraitChanges: function () {
                 this.setMixedAncestry();
                 this.resetNaturalSelection();
+                this.rollBuildType(false);
             },
             setMixedAncestry: function () {
                 if (this.hasAncestralTrait("Mixed Bloodline"))
@@ -916,6 +1071,35 @@
             },
             rollComplexion: function () {
                 this.char_data.complexion = this.rollTable(this.complexions, 100, this.char_data.complexion);
+            },
+            rollBuildType: function (getNew = true) {
+                let original = this.char_data.build_type;
+                if (this.hasAncestralTrait('Mountain Amongst Men') || this.hasAncestralTrait('Physical Prowess'))
+                    this.char_data.build_type = 'Husky';
+                if (this.hasAncestralTrait('Children of the Earth'))
+                    this.char_data.build_type = 'Corpulent';
+                if (this.hasAncestralTrait('Thieving Stunties') || this.hasAncestralTrait('Pintsized'))
+                    this.char_data.build_type = 'Frail';
+                else if (getNew)
+                    this.char_data.build_type = this.rollArray(this.build_types, this.char_data.build_type);
+
+                if (original != this.char_data.build_type)
+                    this.rollHeightWeight();
+            },
+            rollHeightWeight: function () {
+                if (!this.char_data.build_type || !this.char_data.ancestry || !this.char_data.gender)
+                    return;
+                let array = this.heights_weights[this.char_data.ancestry][this.char_data.gender];
+                let values = this.rollArray(array);
+                if (this.hasAncestralTrait('Mountain Amongst Men'))
+                    values = array[9];
+                if (this.hasAncestralTrait('Thieving Stunties') || this.hasAncestralTrait('Pintsized'))
+                    values = array[0];
+                this.char_data.height_weight = this.formatHeightWeight(values);
+            },
+            formatHeightWeight: function (values) {
+                let index = this.build_types.indexOf(this.char_data.build_type) + 1;
+                return `${values[0]}ft ${values[index]} lbs`;
             }
         }
     });
