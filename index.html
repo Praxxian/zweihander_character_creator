@@ -102,7 +102,6 @@
             <h2>Gender & Ancestry</h2>
             <div class="row mb-1">
                 <div class="col-3">
-                    <!-- TODO on change for other things-->
                     <select-roll v-bind:title="'Gender'" v-model="char_data.gender" v-bind:collection="gender_options"
                         v-bind:is_array="true" v-on:roll-click="rollGender()">
                     </select-roll>
@@ -114,19 +113,10 @@
                     </select-roll>
                 </div>
                 <div class="col-3">
-                    <!-- TODO fix that select-roll binding doesn't always work-->
-                    <label for="ancestry_trait" class="form-label">
-                        Ancestral Trait
-                    </label>
-                    <div class="input-group">
-                        <select class="form-select" v-model="char_data.ancestral_trait"
-                            v-on:change="checkAncestralTraitChanges">
-                            <option v-for="trait in ancestral_traits[char_data.ancestry]" :value="trait[2]">{{ trait[2]
-                                }}</option>
-                        </select>
-                        <button class="btn btn-primary btn-sm" v-on:click="rollAncestralTrait" title="Roll"><i
-                                class="bi bi-dice-6"></i></button>
-                    </div>
+                    <select-roll v-bind:title="'Ancestral Trait'" v-model="char_data.ancestral_trait"
+                        v-bind:collection="ancestral_traits[char_data.ancestry]" v-bind:is_array="false"
+                        v-on:roll-click="rollAncestralTrait()" v-on:change="checkAncestralTraitChanges()">
+                    </select-roll>
                 </div>
             </div>
             <div class="row" v-if="char_data.ancestry_mixed">
@@ -137,41 +127,26 @@
                     </select-roll>
                 </div>
                 <div class="col-3">
-                    <!-- TODO fix that select-roll binding doesn't always work-->
-                    <label for="ancestry_trait2" class="form-label">
-                        Mixed Bloodline Trait
-                    </label>
-                    <div class="input-group">
-                        <select class="form-select" v-model="char_data.ancestral_trait_mixed">
-                            <option v-for="trait in ancestral_traits[char_data.ancestry_mixed]" :value="trait[2]">{{
-                                trait[2]
-                                }}</option>
-                        </select>
-                        <button class="btn btn-primary btn-sm" v-on:click="rollMixedAncestralTrait" title="Roll"><i
-                                class="bi bi-dice-6"></i></button>
-                    </div>
+                    <select-roll v-bind:title="'Mixed Bloodline Trait'" v-model="char_data.ancestral_trait_mixed"
+                        v-bind:collection="ancestral_traits[char_data.ancestry_mixed]" v-bind:is_array="false"
+                        v-on:roll-click="rollMixedAncestralTrait()">
+                    </select-roll>
                 </div>
             </div>
         </div>
         <div class="row mb-1 border-top">
-            <h2>Achetype & Profession</h2>
+            <h2>Archetype & Profession</h2>
             <div class="row mb-1">
                 <div class="col-3">
-                    <select-roll v-bind:title="'Achetype'" v-model="char_data.archetype" v-bind:collection="archetypes"
+                    <select-roll v-bind:title="'Archetype'" v-model="char_data.archetype" v-bind:collection="archetypes"
                         v-bind:is_array="false" v-on:roll-click="rollArchetype()" v-on:change="rollProfession()">
                     </select-roll>
                 </div>
                 <div class="col-3">
-                    <!-- TODO fix that select-roll binding doesn't always work-->
-                    <label for="archetype" class="form-label">Profession</label>
-                    <div class="input-group">
-                        <select class="form-select" v-model="char_data.profession">
-                            <option v-for="profession in professions[char_data.archetype]" :value="profession[2]">{{
-                                profession[2] }}</option>
-                        </select>
-                        <button class="btn btn-primary btn-sm" v-on:click="rollProfession()" title="Roll"><i
-                                class="bi bi-dice-6"></i></button>
-                    </div>
+                    <select-roll v-bind:title="'Profession'" v-model="char_data.profession"
+                        v-bind:collection="professions[char_data.archetype]" v-bind:is_array="false"
+                        v-on:roll-click="rollProfession()">
+                    </select-roll>
                 </div>
             </div>
         </div>
@@ -184,16 +159,10 @@
                     </select-roll>
                 </div>
                 <div class="col-6">
-                    <!-- TODO fix that select-roll binding doesn't always work-->
-                    <label for="dooming" class="form-label">Dooming</label>
-                    <div class="input-group">
-                        <select class="form-select" v-model="char_data.dooming">
-                            <option v-for="dooming in doomings[char_data.season]" :value="dooming[2]">{{ dooming[2] }}
-                            </option>
-                        </select>
-                        <button class="btn btn-primary btn-sm" v-on:click="rollDooming()" title="Roll"><i
-                                class="bi bi-dice-6"></i></button>
-                    </div>
+                    <select-roll v-bind:title="'Dooming'" v-model="char_data.dooming"
+                        v-bind:collection="doomings[char_data.season]" v-bind:is_array="false"
+                        v-on:roll-click="rollDooming()">
+                    </select-roll>
                 </div>
             </div>
             <div class="row mb-1">
@@ -240,18 +209,41 @@
     crossorigin="anonymous"></script>
 <script>
     Vue.component('select-roll', {
-        props: ['title', 'value', 'collection', 'is_array'],
+        props: {
+            title: String,
+            value: String,
+            collection: Array,
+            is_array: Boolean
+        },
         template: `<div><label v-if="title" class="form-label">{{ title }}</label>
                     <div class="input-group">
-                        <select class="form-select" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-on:change="$emit('change', $event.target.value)">
-                            <option v-for="x in collection" :value="is_array ? x : x[2]">
-                                {{ is_array ? x : x[2] }}
+                        <select :id="input_id" class="form-select" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-on:change="$emit('change')">
+                            <option v-for="x in collection" v-bind:value="selectItem(x)" :selected="isSelected(x, value)">
+                                {{ selectItem(x) }}
                             </option>
                         </select>
                         <button class="btn btn-primary btn-sm" v-on:click="$emit('roll-click')" title="Roll">
                             <i class="bi bi-dice-6"></i>
                         </button>
-                    </div></div>`
+                    </div></div>`,
+        computed: {
+            input_id: function () {
+                return this.title?.replace(/\W/g, '_').toLowerCase() ?? `select_${Date.now()}`;
+            }
+        },
+        methods: {
+            selectItem: function (element) {
+                return this.is_array ? element : element[2];
+            },
+            isSelected: function (element, val) {
+                return val == this.selectItem(element);
+            }
+        },
+        watch: {
+            value: function (newVal, oldVal) {
+                console.log(`${this.input_id} "${oldVal}" ==> "${newVal}"`);
+            }
+        }
     });
 
     var charApp = new Vue({
@@ -894,8 +886,6 @@
             heighWeightOptions: function () {
                 let values = this.heights_weights[this.char_data.ancestry][this.char_data.gender];
                 let formattedValues = values.map(x => this.formatHeightWeight(x));
-                if (formattedValues.indexOf(this.char_data.height_weight) < 0)
-                    this.rollHeightWeight();
                 return values.map(x => this.formatHeightWeight(x));
             }
         },
@@ -903,14 +893,13 @@
             rollAll: function () {
                 this.primary_attributes_swapped = false;
                 this.rollAllPrimaryAttributes();
-                this.rollGender();
-                this.rollAncestry();
+                this.rollGender(true);
+                this.rollAncestry(true);
                 this.rollArchetype();
                 this.rollSeason();
                 this.rollAge();
                 this.rollComplexion();
                 this.rollBuildType();
-                this.rollHeightWeight();
             },
             rollAllPrimaryAttributes: function () {
                 this.primary_attributes_rolled = true;
@@ -960,9 +949,10 @@
                 this.primary_attributes_rolled = false;
                 this.resetNaturalSelection();
             },
-            rollGender: function () {
+            rollGender: function (rollingAll = false) {
                 this.char_data.gender = this.rollArray(this.gender_options, this.char_data.gender);
-                this.rollHeightWeight();
+                if (!rollingAll)
+                    this.rollHeightWeight();
             },
             rollArray: function (arr, currentValue = null) {
                 if (!arr || arr.length < 1)
@@ -972,10 +962,11 @@
                     newRoll = arr[Math.round(Math.random() * (arr.length - 1))];
                 return newRoll;
             },
-            rollAncestry: function () {
+            rollAncestry: function (rollingAll = false) {
                 this.char_data.ancestry = this.rollArray(this.ancestry_options, this.char_data.ancestry);
                 this.rollAncestralTrait();
-                this.rollHeightWeight();
+                if (!rollingAll)
+                    this.rollHeightWeight();
             },
             rollAncestralTrait: function () {
                 let table = this.ancestral_traits[this.char_data.ancestry];
@@ -1030,10 +1021,6 @@
             },
             hasAncestralTrait: function (traitName) {
                 return traitName && (this.char_data.ancestral_trait?.toUpperCase() == traitName.toUpperCase() || this.char_data.ancestral_trait_mixed?.toUpperCase() == traitName.toUpperCase());
-            },
-            applyThievingStunties: function () {
-                this.char_data.build = "Frail";
-                // TODO height changes
             },
             rollArchetype: function () {
                 this.char_data.archetype = this.rollTable(this.archetypes, 100, this.char_data.archetype);
